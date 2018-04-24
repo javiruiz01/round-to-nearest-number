@@ -25,22 +25,29 @@ redondearDecimal(NumeroInicial, TipoRedondeo, NumeroFinal):-
 
 % Unificación del tipo de rendodeo
 leerTipo(redondeoUnidad, NumeroInicial, NumeroFinal):-
-    recorrerParteEntera(NumeroInicial, NumeroFinal).
+    recorrerParteEntera(NumeroInicial, [],NumeroFinal).
 
 leerTipo(redondeoDecimas, NumeroInicial, NumeroFinal):-.
 
 leerTipo(redondeoCentesimas, NumeroInicial, NumeroFinal):-.
 
 % Deberíamos ir guardando en una lista el valor de la parte entera
-recorrerParteEntera([',' | T], NumeroFinal):-
-    recorrerParteDecimal(T, NumeroFinal).
-recorrerParteEntera([X | T], NumeroFinal):-
+recorrerParteEntera([',' | T], ParteEntera,NumeroFinal):-
+    recorrerParteDecimal(T, ParteEntera, [], NumeroFinal).
+recorrerParteEntera([X | T], ParteEntera ,NumeroFinal):-
     X \= ',',
-    recorrerParteEntera(T, NumeroFinal).
+    append(X, ParteEntera, ParteEntera),
+    recorrerParteEntera(T, ParteEntera, NumeroFinal).
 
 % Recorremos la parte decimal y se guarda en una lista,
 % Para luego crear NumeroFinal
-recorrerParteDecimal([X | T], NumeroFinal):-.
+recorrerParteDecimal([], ParteEntera, ParteDecimal, NumeroFinal):-
+    construirNumeroFinal(ParteEntera, ParteDecimal, NumeroFinal).
+recorrerParteDecimal([X | T], ParteEntera, ParteDecimal, NumeroFinal):-
+    append(X, ParteDecimal, ParteDecimal),
+    recorrerParteDecimal(T, ParteEntera, ParteDecimal, NumeroFinal).
+
+construirNumeroFinal(ParteEntera, ParteDecimal, NumeroFinal).
 
 % Suma Peano
 peano_add(0, N, N).
