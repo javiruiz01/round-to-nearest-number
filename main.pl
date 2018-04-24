@@ -21,33 +21,31 @@
 :- module(_,_).
 
 redondearDecimal(NumeroInicial, TipoRedondeo, NumeroFinal):-
-    leerTipo(TipoRedondeo, NumeroInicial, NumeroFinal).
+    % leerTipo(TipoRedondeo, NumeroInicial, NumeroFinal).
+    recorrerParteEntera(TipoRedondeo, NumeroInicial, [], NumeroFinal).
 
-% Unificación del tipo de rendodeo
-leerTipo(redondeoUnidad, NumeroInicial, NumeroFinal):-
-    recorrerParteEntera(NumeroInicial, [],NumeroFinal).
-
-leerTipo(redondeoDecimas, NumeroInicial, NumeroFinal):-.
-
-leerTipo(redondeoCentesimas, NumeroInicial, NumeroFinal):-.
-
-% Deberíamos ir guardando en una lista el valor de la parte entera
-recorrerParteEntera([',' | T], ParteEntera,NumeroFinal):-
-    recorrerParteDecimal(T, ParteEntera, [], NumeroFinal).
-recorrerParteEntera([X | T], ParteEntera ,NumeroFinal):-
+% Recorremos parte entera y se va guardando en una lista
+% Luego pasamos a parsear la parte decimal
+recorrerParteEntera(TipoRedondeo, [',' | T], ParteEntera, NumeroFinal):-
+    recorrerParteDecimal(TipoRedondeo, T, ParteEntera, [], NumeroFinal).
+recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
     X \= ',',
-    append(X, ParteEntera, ParteEntera),
-    recorrerParteEntera(T, ParteEntera, NumeroFinal).
+    append(X, ParteEntera, Z),
+    recorrerParteEntera(TipoRedondeo, T, Z, NumeroFinal).
 
 % Recorremos la parte decimal y se guarda en una lista,
 % Para luego crear NumeroFinal
-recorrerParteDecimal([], ParteEntera, ParteDecimal, NumeroFinal):-
-    construirNumeroFinal(ParteEntera, ParteDecimal, NumeroFinal).
-recorrerParteDecimal([X | T], ParteEntera, ParteDecimal, NumeroFinal):-
-    append(X, ParteDecimal, ParteDecimal),
-    recorrerParteDecimal(T, ParteEntera, ParteDecimal, NumeroFinal).
+recorrerParteDecimal(TipoRedondeo, [], ParteEntera, ParteDecimal, NumeroFinal):-
+    construirNumeroFinal(TipoRedondeo, ParteEntera, ParteDecimal, NumeroFinal).
+recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, NumeroFinal):-
+    append(X, ParteDecimal, Z),
+    recorrerParteDecimal(TipoRedondeo, T, ParteEntera, Z, NumeroFinal).
 
-construirNumeroFinal(ParteEntera, ParteDecimal, NumeroFinal).
+construirNumeroFinal(redondeoUnidad, ParteEntera, ParteDecimal, NumeroFinal).
+construirNumeroFinal(redondeoDecimas, ParteEntera, ParteDecimal, NumeroFinal).
+construirNumeroFinal(redondeoCentesimas, ParteEntera, ParteDecimal, NumeroFinal).
+
+% recorrerParteEntera(redondeoUnidad, [s(s(s(s(s(0))))),',',s(s(s(0)))], [], []).
 
 % Suma Peano
 peano_add(0, N, N).
