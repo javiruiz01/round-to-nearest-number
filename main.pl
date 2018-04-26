@@ -20,6 +20,8 @@
 
 :- module(_,_).
 
+numeroFinal(Separador, ParteEnteraF, ParteDecimalF).
+
 redondearDecimal(NumeroInicial, TipoRedondeo, NumeroFinal):-
     recorrerParteEntera(TipoRedondeo, NumeroInicial, [], NumeroFinal).
 
@@ -42,15 +44,39 @@ recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, Separador
 
 construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnteraO, ParteDecimalO), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))).
 
-construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEntera, [ X, Y | _ ]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))):-
+construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEnteraO, [ X, Y | _ ]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))):-
     % Uso de less or equals para saber si tenemos que redondear o no
-    redondear(X, Y, Salida).
+    redondear(X, Y, Salida),
+    reverse(Salida, Z), % Porque el append añade por delante
+    comprobarAcarreoParteDecimal(Z),
+    reverse(ParteEnteraO, W),
+    comprobarAcarreoParteEntera(W, Z, SalidaEntera),
+    reverse(Z, Zs),
+    reverse(SalidaEntera, Ws),
+    numeroFinal(Separador, Ws, Zs).
 
 redondear(Elemento, Referencia, Salida) :-
     less_or_equal(Referencia, s(s(s(s(s(0)))))),
-    peano_add(Elemento, 0, Salida).
+    peano_add(Elemento, 0, Z),
+    append([Z], [], Salida).
 redondear(Elemento, Referencia, Salida) :-
-    peano_add(Elemento, s(0), Salida).
+    peano_add(Elemento, s(0), Z),
+    append([Z], [], Salida).
+
+diez(s(s(s(s(s(s(s(s(s(s(0))))))))))).
+comprobarAcarreoParteDecimal([X | T]):-
+    diez(X),
+    suma(T, Salida),
+    comprobarAcarreoParteDecimal(T).
+
+comprobarAcarreoParteEntera([X | T], [Y | _], SalidaEntera) :-
+    diez(X),
+    suma(T, SalidaEntera),
+    comprobarAcarreoParteEntera(SalidaEntera, Y, SalidaEntera).
+
+suma([X | T], Salida):-
+    peano_add(X, s(0), Z),
+    append([Z], T, Salida).
 
 construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, ParteEnteraO, ParteDecimalO), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))).
 
@@ -61,6 +87,14 @@ less_or_equal(0,X) :-
     nat(X).
 less_or_equal(s(X),s(Y)) :-
     less_or_equal(X,Y).
+
+nat(0).
+nat(s(X)) :-
+    nat(X).
+
+append([], Y, Y).
+append([H|X], Y, [H|Z]) :-
+    append(X, Y, Z).
 
 peano_add(0, N, N).
 peano_add( s(N), M, s(Sum) ) :-
