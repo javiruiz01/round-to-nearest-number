@@ -26,7 +26,7 @@ redondearDecimal(NumeroInicial, TipoRedondeo, NumeroFinal):-
 % Recorremos parte entera y se va guardando en una lista
 % Luego pasamos a parsear la parte decimal
 recorrerParteEntera(TipoRedondeo, [',' | T], ParteEntera, NumeroFinal):-
-    recorrerParteDecimal(TipoRedondeo, T, ParteEntera, [], NumeroFinal).
+    recorrerParteDecimal(TipoRedondeo, T, ParteEntera, [], ',',NumeroFinal).
 recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
     X \= ',',
     append([X], ParteEntera, Z),
@@ -34,19 +34,34 @@ recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
 
 % Recorremos la parte decimal y se guarda en una lista,
 % Para luego crear NumeroFinal
-recorrerParteDecimal(TipoRedondeo, [], ParteEntera, ParteDecimal, NumeroFinal):-
-    construirNumeroFinal(TipoRedondeo, ParteEntera, ParteDecimal, NumeroFinal).
-recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, NumeroFinal):-
+recorrerParteDecimal(TipoRedondeo, [], ParteEntera, ParteDecimal, Separador, NumeroFinal):-
+    construirNumeroFinal(redondeo(TipoRedondeo, numeroOriginal(Separador, ParteEntera, ParteDecimal), numeroFinal(Separador, [], []))).
+recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, Separador, NumeroFinal):-
     append([X], ParteDecimal, Z),
-    recorrerParteDecimal(TipoRedondeo, T, ParteEntera, Z, NumeroFinal).
+    recorrerParteDecimal(TipoRedondeo, T, ParteEntera, Z, Separador, NumeroFinal).
 
-construirNumeroFinal(redondeoUnidad, ParteEntera, ParteDecimal, NumeroFinal).
-construirNumeroFinal(redondeoDecimas, ParteEntera, ParteDecimal, NumeroFinal).
-construirNumeroFinal(redondeoCentesimas, ParteEntera, ParteDecimal, NumeroFinal).
+construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnteraO, ParteDecimalO), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))).
+
+construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEntera, [ X, Y | _ ]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))):-
+    % Uso de less or equals para saber si tenemos que redondear o no
+    redondear(X, Y, Salida).
+
+redondear(Elemento, Referencia, Salida) :-
+    less_or_equal(Referencia, s(s(s(s(s(0)))))),
+    peano_add(Elemento, 0, Salida).
+redondear(Elemento, Referencia, Salida) :-
+    peano_add(Elemento, s(0), Salida).
+
+construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, ParteEnteraO, ParteDecimalO), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))).
 
 % recorrerParteEntera(redondeoUnidad, [s(0),',',s(s(s(0)))], [], []).
 
-% Suma Peano
+% Métodos auxiliares
+less_or_equal(0,X) :-
+    nat(X).
+less_or_equal(s(X),s(Y)) :-
+    less_or_equal(X,Y).
+
 peano_add(0, N, N).
 peano_add( s(N), M, s(Sum) ) :-
 	peano_add( N, M, Sum ).
