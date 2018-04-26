@@ -21,7 +21,6 @@
 :- module(_,_).
 
 redondearDecimal(NumeroInicial, TipoRedondeo, NumeroFinal):-
-    % leerTipo(TipoRedondeo, NumeroInicial, NumeroFinal).
     recorrerParteEntera(TipoRedondeo, NumeroInicial, [], NumeroFinal).
 
 % Recorremos parte entera y se va guardando en una lista
@@ -30,7 +29,7 @@ recorrerParteEntera(TipoRedondeo, [',' | T], ParteEntera, NumeroFinal):-
     recorrerParteDecimal(TipoRedondeo, T, ParteEntera, [], NumeroFinal).
 recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
     X \= ',',
-    append(X, ParteEntera, Z),
+    append([X], ParteEntera, Z),
     recorrerParteEntera(TipoRedondeo, T, Z, NumeroFinal).
 
 % Recorremos la parte decimal y se guarda en una lista,
@@ -38,14 +37,14 @@ recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
 recorrerParteDecimal(TipoRedondeo, [], ParteEntera, ParteDecimal, NumeroFinal):-
     construirNumeroFinal(TipoRedondeo, ParteEntera, ParteDecimal, NumeroFinal).
 recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, NumeroFinal):-
-    append(X, ParteDecimal, Z),
+    append([X], ParteDecimal, Z),
     recorrerParteDecimal(TipoRedondeo, T, ParteEntera, Z, NumeroFinal).
 
 construirNumeroFinal(redondeoUnidad, ParteEntera, ParteDecimal, NumeroFinal).
 construirNumeroFinal(redondeoDecimas, ParteEntera, ParteDecimal, NumeroFinal).
 construirNumeroFinal(redondeoCentesimas, ParteEntera, ParteDecimal, NumeroFinal).
 
-% recorrerParteEntera(redondeoUnidad, [s(s(s(s(s(0))))),',',s(s(s(0)))], [], []).
+% recorrerParteEntera(redondeoUnidad, [s(0),',',s(s(s(0)))], [], []).
 
 % Suma Peano
 peano_add(0, N, N).
