@@ -31,7 +31,7 @@ recorrerParteEntera(TipoRedondeo, [',' | T], ParteEntera, NumeroFinal):-
     recorrerParteDecimal(TipoRedondeo, T, ParteEntera, [], ',',NumeroFinal).
 recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
     X \= ',',
-    append([X], ParteEntera, Z),
+    append(ParteEntera, [X],  Z),
     recorrerParteEntera(TipoRedondeo, T, Z, NumeroFinal).
 
 % Recorremos la parte decimal y se guarda en una lista,
@@ -39,7 +39,7 @@ recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
 recorrerParteDecimal(TipoRedondeo, [], ParteEntera, ParteDecimal, Separador, NumeroFinal):-
     construirNumeroFinal(redondeo(TipoRedondeo, numeroOriginal(Separador, ParteEntera, ParteDecimal), numeroFinal(Separador, [], []))).
 recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, Separador, NumeroFinal):-
-    append([X], ParteDecimal, Z),
+    append(ParteDecimal, [X],  Z),
     recorrerParteDecimal(TipoRedondeo, T, ParteEntera, Z, Separador, NumeroFinal).
 
 construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnteraO, ParteDecimalO), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))).
@@ -48,7 +48,7 @@ construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEn
     % Uso de less or equals para saber si tenemos que redondear o no
     redondear(X, Y, Salida),
     reverse(Salida, Z), % Porque el append añade por delante
-    comprobarAcarreoParteDecimal(Z),
+    comprobarAcarreoParteDecimal(Z, SalidaDecimal),
     reverse(ParteEnteraO, W),
     comprobarAcarreoParteEntera(W, Z, SalidaEntera),
     reverse(Z, Zs),
@@ -56,21 +56,23 @@ construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEn
     numeroFinal(Separador, Ws, Zs).
 
 redondear(Elemento, Referencia, Salida) :-
-    less_or_equal(Referencia, s(s(s(s(s(0)))))),
+    less_or_equal(Referencia, s(s(s(s(0))))),
     peano_add(Elemento, 0, Z),
     append([Z], [], Salida).
 redondear(Elemento, Referencia, Salida) :-
     peano_add(Elemento, s(0), Z),
     append([Z], [], Salida).
 
-diez(s(s(s(s(s(s(s(s(s(s(0))))))))))).
-comprobarAcarreoParteDecimal([X | T]):-
-    diez(X),
+comprobarAcarreoParteDecimal([X | T], Salida):-
+    X = s(s(s(s(s(s(s(s(s(s(0)))))))))),
     suma(T, Salida),
-    comprobarAcarreoParteDecimal(T).
+    comprobarAcarreoParteDecimal(T, Salida).
+comprobarAcarreoParteDecimal([X | T], Salida):-
+    peano_add(X, 0, Z),
+    comprobarAcarreoParteDecimal(T, Z).
 
 comprobarAcarreoParteEntera([X | T], [Y | _], SalidaEntera) :-
-    diez(X),
+    X = s(s(s(s(s(s(s(s(s(s(0)))))))))),
     suma(T, SalidaEntera),
     comprobarAcarreoParteEntera(SalidaEntera, Y, SalidaEntera).
 
