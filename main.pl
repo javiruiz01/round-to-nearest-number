@@ -45,8 +45,8 @@ construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnt
     comprobarParteEntera(Z, X, Salida).
 
 comprobarParteEntera(ParteEntera, Referencia, Salida) :-
+    less_or_equal(Referencia, s(s(s(s(0))))),
     reverse(ParteEntera, Salida).
-
 comprobarParteEntera([Elemento | T], Referencia, Salida) :-
     less_or_equal(s(s(s(s(0)))), Referencia),
     peano_add(Elemento, s(0), NewElemento),
@@ -63,12 +63,22 @@ construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, Part
     my_append(ParteEnteraF, ParteEnteraO, Z),
     my_append(ParteDecimalF, [W, Decimal], Zs).
 
-redondearParteDecimal(ParteEnteraO, [Elemento, Referencia | T], Salida) :-
+redondearParteDecimal(ParteEnteraO, [Elemento, Referencia | _], Salida) :-
     less_or_equal(Referencia, s(s(s(s(0))))),
     peano_add(Elemento, 0, Z).
 redondearParteDecimal(ParteEnteraO, [Elemento, Referencia | _], Salida) :-
     less_or_equal(s(s(s(s(0)))), Referencia),
-    peano_add(Elemento, s(0), Salida).
+    peano_add(Elemento, s(0), Salida),
+    reverse(Z, Zs),
+    comprobarAcarreo(Zs).
+
+comprobarAcarreo([X | T]]) :-
+    X = s(s(s(s(s(s(s(s(s(s(0)))))))))),
+    acarreo(T, s(0)).
+acarreo([X|T], s(0)) :-
+    peano_add(X, s(0), Xs),
+    my_append([Xs], T, Ts),
+    comprobarAcarreo(Ts).
 
 % Métodos auxiliares
 less_or_equal(0,X) :-
