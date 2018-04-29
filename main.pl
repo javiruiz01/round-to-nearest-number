@@ -40,25 +40,35 @@ recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, Separador
     my_append(ParteDecimal, [X],  Z),
     recorrerParteDecimal(TipoRedondeo, T, ParteEntera, Z, Separador, NumeroFinal).
 
-construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnteraO, ParteDecimalO), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))).
+construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnteraO, [X | T]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))):-
+    reverse(ParteEnteraO, Z),
+    comprobarParteEntera(Z, X, Salida).
+
+comprobarParteEntera(ParteEntera, Referencia, Salida) :-
+    reverse(ParteEntera, Salida).
+
+comprobarParteEntera([Elemento | T], Referencia, Salida) :-
+    less_or_equal(s(s(s(s(0)))), Referencia),
+    peano_add(Elemento, s(0), NewElemento),
+    append([NewElemento], T, Z),
+    reverse(Z, Salida).
 
 construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEnteraO, [ X, Y | _ ]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))):-
-    redondearParteDecimal(ParteEnteraO, X, Y, Decimal),
+    redondearParteDecimal(ParteEnteraO, [X, Y], Decimal),
     my_append(ParteEnteraF, ParteEnteraO, Z),
     my_append(ParteDecimalF, [Decimal], Zs).
 
-redondearParteDecimal(ParteEnteraO, Elemento, Referencia, Salida) :-
+construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, ParteEnteraO, [W, X, Y | T]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))) :-
+    redondearParteDecimal(ParteEnteraO, [X, Y], Decimal),
+    my_append(ParteEnteraF, ParteEnteraO, Z),
+    my_append(ParteDecimalF, [W, Decimal], Zs).
+
+redondearParteDecimal(ParteEnteraO, [Elemento, Referencia | T], Salida) :-
     less_or_equal(Referencia, s(s(s(s(0))))),
     peano_add(Elemento, 0, Z).
-redondearParteDecimal(ParteEnteraO, Elemento, Referencia, Salida) :-
+redondearParteDecimal(ParteEnteraO, [Elemento, Referencia | _], Salida) :-
     less_or_equal(s(s(s(s(0)))), Referencia),
     peano_add(Elemento, s(0), Salida).
-
-suma([X | T], Salida) :-
-    peano_add(X, s(0), Z),
-    my_append([Z], T, Salida).
-
-construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, ParteEnteraO, ParteDecimalO), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))).
 
 % Métodos auxiliares
 less_or_equal(0,X) :-
