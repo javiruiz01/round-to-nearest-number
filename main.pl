@@ -34,7 +34,7 @@ recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
 
 % Recorremos la parte decimal y se guarda en una lista,
 % Para luego crear NumeroFinal
-recorrerParteDecimal(TipoRedondeo, [], ParteEntera, ParteDecimal, Separador, NumeroFinal):-
+recorrerParteDecimal(TipoRedondeo, [], ParteEntera, ParteDecimal, Separador, redondeo(TipoRedondeo, numeroOriginal(Separador, ParteEntera, ParteDecimal), numeroRedondeado(Separador, ParteEnteraF, ParteDecimalF))):-
     construirNumeroFinal(redondeo(TipoRedondeo, numeroOriginal(Separador, ParteEntera, ParteDecimal), numeroRedondeado(Separador, ParteEnteraF, ParteDecimalF))).
 recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, Separador, NumeroFinal):-
     my_append(ParteDecimal, [X],  Z),
@@ -45,7 +45,7 @@ construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnt
     comprobarParteEntera(Z, X, Zs),
     reverse(Zs, [Y | U]),
     comprobarAcarreoUnidad(U, Y, Salida),
-    Salida = ParteEnteraF,
+    [Salida] = ParteEnteraF,
     [] = ParteDecimalF.
 
 comprobarParteEntera(ParteEntera, Referencia, Salida) :-
@@ -61,9 +61,7 @@ construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEn
     redondearParteDecimal(ParteEnteraO, [X, Y], NuevaParteDecimal),
     reverse(ParteEnteraO, Z),
     comprobarAcarreoEntero(Z, NuevaParteDecimal, SalidaEntera, SalidaDecimal),
-    reverse(SalidaEntera, [Xs | Ts]),
-    comprobarAcarreoUnidad(Ts, Xs, NuevaParteEntera),
-    NuevaParteEntera = ParteEnteraF,
+    SalidaEntera = ParteEnteraF,
     [SalidaDecimal] = ParteDecimalF.
 
 construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, ParteEnteraO, [W, X, Y | T]), numeroRedondeado(Separador, ParteEnteraF, ParteDecimalF))) :-
@@ -72,6 +70,7 @@ construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, Part
     ParteEnteraO = ParteEnteraF,
     Z = ParteDecimalF.
 
+% Creo que no hace falta que se le pase la parte entera, nos encargamos en otro sitio
 redondearParteDecimal(ParteEnteraO, [Elemento, Referencia | _], Salida) :-
     less_or_equal(Referencia, s(s(s(s(0))))),
     peano_add(Elemento, 0, Salida).
@@ -98,10 +97,11 @@ comprobarAcarreoEntero([X | T], Ref, SalidaEntera, SalidaDecimal) :-
     Ref = s(s(s(s(s(s(s(s(s(s(0)))))))))),
     peano_add(X, s(0), Xs),
     SalidaDecimal = 0,
-    comprobarAcarreo([Xs | T], SalidaEntera).
-comprobarAcarreoEntero(ParteEntera, Ref, Salida) :-
+    comprobarAcarreoUnidad(T, Xs, SalidaEntera).
+comprobarAcarreoEntero(ParteEntera, Ref, SalidaEntera, SalidaDecimal) :-
     Ref \= s(s(s(s(s(s(s(s(s(s(0)))))))))),
-    reverse(ParteEntera, Salida).
+    SalidaDecimal = 0,
+    reverse(ParteEntera, SalidaEntera).
 
 comprobarAcarreoUnidad([], Ref, Salida) :-
     Ref = Salida.
@@ -137,9 +137,10 @@ peano_add( s(N), M, s(Sum) ) :-
 	peano_add( N, M, Sum ).
 
 % Ejemplo
-% redondearDecimal([s(s(s(s(s(0))))),',',s(s(s(0)))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(s(s(s(s(0)))))], [s(s(s(0)))]), numeroRedondeado(',', [s(s(s(s(s(0)))))], []))).
+% Funciona: redondearDecimal([s(s(s(s(s(0))))),',',s(s(s(0)))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(s(s(s(s(0)))))], [s(s(s(0)))]), numeroRedondeado(',', [s(s(s(s(s(0)))))], []))).
 % redondearDecimal([s(s(s(s(s(0))))),',',s(s(s(0)))], redondeoUnidad, X). --> Mirar a ver como hacer para que nos devuevla la respuesta
 % redondearDecimal([s(0), s(0), ',', s(s(s(s(s(s(s(s(s(0))))))))) , s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0), s(0)], [s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(0), s(s(0))], []))).
 % redondearDecimal([s(0), ',', s(s(s(0))), s(s(s(s(s(0))))), s(0)], redondeoCentesimas, redondeo(redondeoCentesimas, numeroOriginal(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0))))), s(0)]), numeroRedondeado(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0)))))]))).
 % redondearDecimal([s(0), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(0)))))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(0), s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(s(0)), 0], []))).
-% redondearDecimal([s(0), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0), s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))], numeroRedondeado(',', [s(s(0)), 0], [])))).
+% Funciona: redondearDecimal([s(0), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0), s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))], numeroRedondeado(',', [s(s(0)), 0], [])))).
+% redondearDecimal([s(0), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0), s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))], numeroRedondeado(',', [s(0), 0], [])))).
