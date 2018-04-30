@@ -35,14 +35,16 @@ recorrerParteEntera(TipoRedondeo, [X | T], ParteEntera ,NumeroFinal):-
 % Recorremos la parte decimal y se guarda en una lista,
 % Para luego crear NumeroFinal
 recorrerParteDecimal(TipoRedondeo, [], ParteEntera, ParteDecimal, Separador, NumeroFinal):-
-    construirNumeroFinal(redondeo(TipoRedondeo, numeroOriginal(Separador, ParteEntera, ParteDecimal), numeroFinal(Separador, [], []))).
+    construirNumeroFinal(redondeo(TipoRedondeo, numeroOriginal(Separador, ParteEntera, ParteDecimal), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))).
 recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, Separador, NumeroFinal):-
     my_append(ParteDecimal, [X],  Z),
     recorrerParteDecimal(TipoRedondeo, T, ParteEntera, Z, Separador, NumeroFinal).
 
-construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnteraO, [X | T]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))):-
+construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnteraO, [X | _]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))):-
     reverse(ParteEnteraO, Z),
-    comprobarParteEntera(Z, X, Salida).
+    comprobarParteEntera(Z, X, Salida),
+    Salida = ParteEnteraF,
+    [] = ParteDecimalF.
 
 comprobarParteEntera(ParteEntera, Referencia, Salida) :-
     less_or_equal(Referencia, s(s(s(s(0))))),
@@ -72,7 +74,7 @@ redondearParteDecimal(ParteEnteraO, [Elemento, Referencia | _], Salida) :-
     reverse(Z, Zs),
     comprobarAcarreo(Zs).
 
-comprobarAcarreo([X | T]]) :-
+comprobarAcarreo([X | T]) :-
     X = s(s(s(s(s(s(s(s(s(s(0)))))))))),
     acarreo(T, s(0)).
 acarreo([X|T], s(0)) :-
