@@ -42,9 +42,23 @@ recorrerParteDecimal(TipoRedondeo, [X | T], ParteEntera, ParteDecimal, Separador
 
 construirNumeroFinal(redondeo(redondeoUnidad, numeroOriginal(Separador, ParteEnteraO, [X | _]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))):-
     reverse(ParteEnteraO, Z),
-    comprobarParteEntera(Z, X, Salida),
+    comprobarParteEntera(Z, X, Zs),
+    reverse(Zs, [Y | U]),
+    comprobarAcarreoUnidad(U, Y, Salida),
     Salida = ParteEnteraF,
     [] = ParteDecimalF.
+
+comprobarAcarreoUnidad([X | T], Ref, Salida) :-
+    Ref = s(s(s(s(s(s(s(s(s(s(0)))))))))),
+    peano_add(X, s(0), Xs),
+    my_append([0], [Xs], Refs),
+    my_append(Refs, T, [Y | U]),
+    comprobarAcarreoUnidad(U, Y, Salida).
+comprobarAcarreoUnidad([X | T], Ref, Salida) :-
+    Ref \= s(s(s(s(s(s(s(s(s(s(0)))))))))),
+    my_append([Ref], [X], Refs),
+    my_append(Refs, T, Ts),
+    reverse(Ts, Salida).
 
 comprobarParteEntera(ParteEntera, Referencia, Salida) :-
     less_or_equal(Referencia, s(s(s(s(0))))),
@@ -122,3 +136,4 @@ peano_add( s(N), M, s(Sum) ) :-
 % redondearDecimal([s(s(s(s(s(0))))),',',s(s(s(0)))], redondeoUnidad, X). --> Mirar a ver como hacer para que nos devuevla la respuesta
 % redondearDecimal([s(0), s(0), ',', s(s(s(s(s(s(s(s(s(0))))))))) , s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0), s(0)], [s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(0), s(s(0))], []))).
 % redondearDecimal([s(0), ',', s(s(s(0))), s(s(s(s(s(0))))), s(0)], redondeoCentesimas, redondeo(redondeoCentesimas, numeroOriginal(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0))))), s(0)]), numeroRedondeado(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0)))))]))).
+% redondearDecimal([s(0), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(0)))))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(0), s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(s(0)), 0], []))).
