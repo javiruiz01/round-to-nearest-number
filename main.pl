@@ -61,9 +61,10 @@ construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEn
     [Salida] = ParteDecimalF.
 
 construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, ParteEnteraO, [W, X, Y | T]), numeroFinal(Separador, ParteEnteraF, ParteDecimalF))) :-
-    redondearParteDecimal(ParteEnteraO, [X, Y], Decimal),
-    my_append(ParteEnteraF, ParteEnteraO, Z),
-    my_append(ParteDecimalF, [W, Decimal], Zs).
+    redondearParteDecimal(ParteEnteraO, [X, Y], Salida),
+    append([W], [Salida], Z),
+    ParteEnteraO = ParteEnteraF,
+    Z = ParteDecimalF.
 
 redondearParteDecimal(ParteEnteraO, [Elemento, Referencia | _], Salida) :-
     less_or_equal(Referencia, s(s(s(s(0))))),
@@ -104,3 +105,4 @@ peano_add( s(N), M, s(Sum) ) :-
 % redondearDecimal([s(s(s(s(s(0))))),',',s(s(s(0)))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(s(s(s(s(0)))))], [s(s(s(0)))]), numeroRedondeado(',', [s(s(s(s(s(0)))))], []))).
 % redondearDecimal([s(s(s(s(s(0))))),',',s(s(s(0)))], redondeoUnidad, X). --> Mirar a ver como hacer para que nos devuevla la respuesta
 % redondearDecimal([s(0), ',', s(s(s(0))), s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(0)], [s(s(s(s(0))))]))).
+% redondearDecimal([s(0), ',', s(s(s(0))), s(s(s(s(s(0))))), s(0)], redondeoCentesimas, redondeo(redondeoCentesimas, numeroOriginal(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0))))), s(0)]), numeroRedondeado(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0)))))]))).
