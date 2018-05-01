@@ -62,7 +62,7 @@ construirNumeroFinal(redondeo(redondeoDecimas, numeroOriginal(Separador, ParteEn
     reverse(ParteEnteraO, Z),
     comprobarAcarreoEntero(Z, NuevaParteDecimal, SalidaEntera, SalidaDecimal),
     SalidaEntera = ParteEnteraF,
-    [SalidaDecimal] = ParteDecimalF.
+    SalidaDecimal = ParteDecimalF.
 
 construirNumeroFinal(redondeo(redondeoCentesimas, numeroOriginal(Separador, ParteEnteraO, [W, X, Y | T]), numeroRedondeado(Separador, ParteEnteraF, ParteDecimalF))) :-
     redondearParteDecimal(ParteEnteraO, [X, Y], Salida),
@@ -96,11 +96,11 @@ acarreo([X|T]) :-
 comprobarAcarreoEntero([X | T], Ref, SalidaEntera, SalidaDecimal) :-
     Ref = s(s(s(s(s(s(s(s(s(s(0)))))))))),
     peano_add(X, s(0), Xs),
-    SalidaDecimal = 0,
+    SalidaDecimal = [],
     comprobarAcarreoUnidad(T, Xs, SalidaEntera).
 comprobarAcarreoEntero(ParteEntera, Ref, SalidaEntera, SalidaDecimal) :-
     Ref \= s(s(s(s(s(s(s(s(s(s(0)))))))))),
-    SalidaDecimal = 0,
+    SalidaDecimal = [],
     reverse(ParteEntera, SalidaEntera).
 
 comprobarAcarreoUnidad([], Ref, Salida) :-
@@ -116,7 +116,6 @@ comprobarAcarreoUnidad([X | T], Ref, Salida) :-
     my_append([Ref], [X], Refs),
     my_append(Refs, T, Ts),
     reverse(Ts, Salida).
-
 
 % Métodos auxiliares
 less_or_equal(0,X) :-
@@ -138,7 +137,6 @@ peano_add( s(N), M, s(Sum) ) :-
 
 % Ejemplo
 % Funciona: redondearDecimal([s(s(s(s(s(0))))),',',s(s(s(0)))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(s(s(s(s(0)))))], [s(s(s(0)))]), numeroRedondeado(',', [s(s(s(s(s(0)))))], []))).
-% redondearDecimal([s(s(s(s(s(0))))),',',s(s(s(0)))], redondeoUnidad, X). --> Mirar a ver como hacer para que nos devuevla la respuesta
 % redondearDecimal([s(0), s(0), ',', s(s(s(s(s(s(s(s(s(0))))))))) , s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0), s(0)], [s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(0), s(s(0))], []))).
 % redondearDecimal([s(0), ',', s(s(s(0))), s(s(s(s(s(0))))), s(0)], redondeoCentesimas, redondeo(redondeoCentesimas, numeroOriginal(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0))))), s(0)]), numeroRedondeado(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0)))))]))).
 % redondearDecimal([s(0), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(0)))))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(0), s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(s(0)), 0], []))).
