@@ -117,12 +117,12 @@ comprobarAcarreoUnidad([], s(s(s(s(s(s(s(s(s(s(0)))))))))), [], New, Salida) :-
 comprobarAcarreoUnidad([], Ref, [], New, Salida) :-
     Ref \= s(s(s(s(s(s(s(s(s(s(0)))))))))),
     my_append([Ref], New, Salida).
-comprobarAcarreoUnidad([X | T], Ref, [Y | U], New, Salida) :-
+comprobarAcarreoUnidad([X | T], Ref, [_ | U], New, Salida) :-
     Ref = s(s(s(s(s(s(s(s(s(s(0)))))))))),
     peano_add(X, s(0), Xs),
     append(New, [0], NewS),
     comprobarAcarreoUnidad(T, Xs, U, NewS, Salida).
-comprobarAcarreoUnidad([X | T], Ref, [Y | U], New, Salida) :-
+comprobarAcarreoUnidad([X | _], Ref, _, New, Salida) :-
     Ref \= s(s(s(s(s(s(s(s(s(s(0)))))))))),
     append(New, [Ref], NewS),
     append(NewS, [X], Ts),
@@ -153,4 +153,5 @@ peano_add( s(N), M, s(Sum) ) :-
 % Funciona: redondearDecimal([s(0), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0), s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(s(0)), 0], []))).
 % Funciona: redondearDecimal([s(0), ',', s(s(s(0))), s(s(s(s(s(0))))), s(0)], redondeoCentesimas, redondeo(redondeoCentesimas, numeroOriginal(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0))))), s(0)]), numeroRedondeado(',', [s(0)], [s(s(s(0))), s(s(s(s(s(0)))))]))).
 % Funciona: redondearDecimal([s(0), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))], redondeoDecimas, redondeo(redondeoDecimas, numeroOriginal(',', [s(0), s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(0)))))]), numeroRedondeado(',', [s(s(0)), 0], []))).
-% redondearDecimal([s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(s(s(s(s(0)))))))))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(s(s(s(s(s(s(s(s(0))))))))),s(s(s(s(s(s(s(s(s(0))))))))),s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(s(s(s(s(0)))))))))]), numeroRedondeado(',', [s(0), 0, 0, 0], []))).
+% Funciona: redondearDecimal([s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(s(s(s(s(0)))))))))], redondeoUnidad, redondeo(redondeoUnidad, numeroOriginal(',', [s(s(s(s(s(s(s(s(s(0))))))))),s(s(s(s(s(s(s(s(s(0))))))))),s(s(s(s(s(s(s(s(s(0)))))))))], [s(s(s(s(s(s(s(s(s(0)))))))))]), numeroRedondeado(',', [s(0), 0, 0, 0], []))).
+% Funciona: redondearDecimal([s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(s(s(s(s(0))))))))), s(s(s(s(s(s(s(s(s(0))))))))), ',', s(s(s(s(s(s(s(s(s(0)))))))))], redondeoUnidad, X).
